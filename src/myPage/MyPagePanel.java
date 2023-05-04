@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JToggleButton;
+
+import java.awt.CardLayout;
 import java.awt.Color;
 import javax.swing.JSeparator;
 import javax.swing.JLabel;
@@ -25,90 +27,58 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MyPagePanel extends JPanel {
 	
+	// 패널 불러오기
 	InformationViewPanel infoPanel = new InformationViewPanel();
 	TicketViewPanel ticketPanel = new TicketViewPanel();
+	MileageViewPanel mileagePanel = new MileageViewPanel();
+	ModifyInfoDialog modifyInfo = new ModifyInfoDialog();
+	
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	
 	private BufferedImage image;
+	
+	CardLayout card = new CardLayout();
 	
 	/**
 	 * Create the panel.
 	 */
 	public MyPagePanel() {
+		
+		// 이미지 읽어 오기
 		try {
-            image = ImageIO.read(new File("resources/background.png"));
+            image = ImageIO.read(new File("ui/background.png"));
         } catch (IOException ex) {
-            // 예외 처리
         }
 		
-		ticketPanel.setVisible(false);
-		
+		// 패널 설정
 		setBounds(0, 0, 1920, 1080);
 		setBackground(new Color(73, 67, 68));
 		setLayout(null);
+		infoPanel.getModifyInfo(modifyInfo);
 		
-		JPanel panel = new JPanel();
-		panel.setBackground(new Color(63, 58, 60));
-		panel.setBounds(111, 211, 811, 138);
-		add(panel);
-		panel.setLayout(null);
+		modifyInfo.setVisible(false);
+		modifyInfo.setLocation(479, 312);
+		add(modifyInfo);
 		
-		JToggleButton informationViewBtn = new JToggleButton("정보 보기");
-		informationViewBtn.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				infoPanel.setVisible(true);
-			}
-			
-		});
+		// 카드 레이아웃을 사용할 기본 패널 만들기
+		JPanel initPanel = new JPanel();
+		initPanel.setBackground(new Color(63, 58, 60));
+		initPanel.setBounds(700, 350, 908, 613);
+		initPanel.setLayout(card);
+		add(initPanel);
 		
-		informationViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 30));
-		buttonGroup.add(informationViewBtn);
-		informationViewBtn.setBounds(212, 20, 192, 100);
-		panel.add(informationViewBtn);
+		// 기본 패널에 각 기능의 패널 붙이기
+		initPanel.add(infoPanel, "info");
+		initPanel.add(ticketPanel, "ticket");
+		initPanel.add(mileagePanel, "mileage");
 		
-		JToggleButton ticketViewBtn = new JToggleButton("이용권");
-		ticketViewBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ticketPanel.setVisible(true);
-			}
-		});
-		ticketViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 32));
-		buttonGroup.add(ticketViewBtn);
-		ticketViewBtn.setBounds(420, 20, 182, 100);
-		panel.add(ticketViewBtn);
 		
-		JToggleButton mileageViewBtn = new JToggleButton("마일리지");
-		mileageViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 32));
-		buttonGroup.add(mileageViewBtn);
-		mileageViewBtn.setBounds(617, 20, 182, 100);
-		panel.add(mileageViewBtn);
-		
-		JLabel myPageLabel = new JLabel("<html>0000님의<br>마이페이지</html>");
-		myPageLabel.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-		myPageLabel.setForeground(new Color(255, 255, 255));
-		myPageLabel.setBounds(20, 20, 180, 100);
-		panel.add(myPageLabel);
-		
-		JSeparator tapSep1 = new JSeparator();
-		tapSep1.setForeground(new Color(255, 255, 255));
-		tapSep1.setBackground(new Color(255, 255, 255));
-		tapSep1.setOrientation(SwingConstants.VERTICAL);
-		tapSep1.setBounds(412, 18, 10, 110);
-		panel.add(tapSep1);
-		
-		JSeparator tapSep2 = new JSeparator();
-		tapSep2.setForeground(new Color(255, 255, 255));
-		tapSep2.setOrientation(SwingConstants.VERTICAL);
-		tapSep2.setBounds(608, 18, 10, 110);
-		panel.add(tapSep2);
-		
-		add(infoPanel);
-		add(ticketPanel);
-		
+		// 닫기 버튼
 		JButton btnNewButton = new JButton("닫기");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -117,6 +87,73 @@ public class MyPagePanel extends JPanel {
 		});
 		btnNewButton.setBounds(1774, 10, 117, 112);
 		add(btnNewButton);
+		
+		// 토글 버튼
+		//정보 보기 버튼
+		JToggleButton informationViewBtn = new JToggleButton("정보 보기");
+		informationViewBtn.setForeground(new Color(255, 255, 255));
+		informationViewBtn.setBounds(300, 350, 226, 145);
+		informationViewBtn.setSelected(true);
+		informationViewBtn.setContentAreaFilled(false);
+		informationViewBtn.setBorderPainted(false);
+		add(informationViewBtn);
+		informationViewBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// 버튼을 누르면 정보 보기 패널 뜸
+				card.show(initPanel, "info");
+			}
+		});
+		informationViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 42));
+		buttonGroup.add(informationViewBtn);
+		
+		// 이용권 버튼
+		JToggleButton ticketViewBtn = new JToggleButton("이용권");
+		ticketViewBtn.setBounds(300, 580, 226, 145);
+		add(ticketViewBtn);
+		ticketViewBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 버튼을 누르면 이용권 보기 패널 뜸
+				card.show(initPanel, "ticket");
+			}
+		});
+		ticketViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 32));
+		buttonGroup.add(ticketViewBtn);
+		
+		// 마일리지 버튼
+		JToggleButton mileageViewBtn = new JToggleButton("마일리지");
+		mileageViewBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// 버튼을 누르면 마일리지 보기 패널 뜸
+				card.show(initPanel, "mileage");
+			}
+		});
+		mileageViewBtn.setBounds(300, 810, 226, 145);
+		mileageViewBtn.setFont(new Font("맑은 고딕", Font.BOLD, 32));
+		add(mileageViewBtn);
+		buttonGroup.add(mileageViewBtn);
+		
+		// 라벨로 만든 로그아웃 버튼
+		JLabel rogOutLabel = new JLabel("로그아웃");
+		rogOutLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// 클릭하면 로그아웃
+				System.exit(0);
+			}
+		});
+		rogOutLabel.setForeground(new Color(255, 255, 255));
+		rogOutLabel.setFont(new Font("맑은 고딕", Font.BOLD, 32));
+		rogOutLabel.setBounds(110, 201, 129, 64);
+		add(rogOutLabel);
+		
+		// 라벨로 만든 좌석 보기 버튼
+		JLabel seatViewLabel = new JLabel("좌석 보기");
+		seatViewLabel.setForeground(Color.WHITE);
+		seatViewLabel.setFont(new Font("맑은 고딕", Font.BOLD, 32));
+		seatViewLabel.setBounds(1672, 201, 144, 64);
+		add(seatViewLabel);
 
 	}
 	

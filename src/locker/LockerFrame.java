@@ -1,4 +1,4 @@
-package myPage;
+package locker;
 
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
@@ -7,15 +7,12 @@ import java.awt.GraphicsEnvironment;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 
-public class MyPageFrame extends JFrame {
+public class LockerFrame extends JFrame {
 
-	private JPanel mpp = new MyPagePanel();
+	LockerPanel lockerPanel = new LockerPanel();
 	GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	GraphicsDevice gd = ge.getDefaultScreenDevice();
-	
-
 	/**
 	 * Launch the application.
 	 */
@@ -23,7 +20,7 @@ public class MyPageFrame extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MyPageFrame frame = new MyPageFrame();
+					LockerFrame frame = new LockerFrame();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -35,12 +32,14 @@ public class MyPageFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MyPageFrame() {
+	public LockerFrame() {
 		setUndecorated(true);
 		gd.setFullScreenWindow(this);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1920, 1080);
-		add(mpp);
+		getContentPane().setLayout(null);
+		add(lockerPanel);
 	}
+
 }
